@@ -11,7 +11,7 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-     _instanceof:
+    _instanceof:
         Goteo\BenzinaBundle\Pump\PumpInterface:
             tags: ['goteo.benzina.pump']
 
