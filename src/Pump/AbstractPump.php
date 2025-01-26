@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Library\Benzina\Pump;
+namespace Goteo\BenzinaBundle\Pump;
 
 abstract class AbstractPump implements PumpInterface
 {

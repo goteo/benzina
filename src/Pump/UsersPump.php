@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Library\Benzina\Pump;
+namespace Goteo\BenzinaBundle\Pump;
 
 use App\Entity\User\User;
-use App\Library\Benzina\Pump\Trait\ArrayPumpTrait;
-use App\Library\Benzina\Pump\Trait\DoctrinePumpTrait;
+use Goteo\BenzinaBundle\Pump\Trait\ArrayPumpTrait;
+use Goteo\BenzinaBundle\Pump\Trait\DoctrinePumpTrait;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UsersPump extends AbstractPump implements PumpInterface

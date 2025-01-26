@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Library\Benzina\Pump;
+namespace Goteo\BenzinaBundle\Pump;
 
 use App\Entity\Accounting\Accounting;
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectStatus;
 use App\Entity\Project\ProjectTerritory;
 use App\Entity\User\User;
-use App\Library\Benzina\Pump\Trait\ArrayPumpTrait;
-use App\Library\Benzina\Pump\Trait\DoctrinePumpTrait;
+use Goteo\BenzinaBundle\Pump\Trait\ArrayPumpTrait;
+use Goteo\BenzinaBundle\Pump\Trait\DoctrinePumpTrait;
 use App\Repository\User\UserRepository;
 use App\Service\LocalizationService;
 use App\Service\Project\TerritoryService;

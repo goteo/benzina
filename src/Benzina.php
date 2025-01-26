@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Library\Benzina;
+namespace Goteo\BenzinaBundle;
 
-use App\Library\Benzina\Pump\PumpInterface;
-use App\Library\Benzina\Stream\StreamInterface;
+use Goteo\BenzinaBundle\Pump\PumpInterface;
+use Goteo\BenzinaBundle\Stream\StreamInterface;
 
 class Benzina
 {
