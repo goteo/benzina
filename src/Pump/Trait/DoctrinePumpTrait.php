@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Library\Benzina\Pump\Trait;
+namespace Goteo\BenzinaBundle\Pump\Trait;
 
-use App\Library\Benzina\Pump\PumpInterface;
+use Goteo\BenzinaBundle\Pump\PumpInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 trait DoctrinePumpTrait

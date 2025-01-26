@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Library\Benzina\Pump;
+namespace Goteo\BenzinaBundle\Pump;
 
 use App\Entity\Gateway\Charge;
 use App\Entity\Gateway\Checkout;
@@ -15,8 +15,8 @@ use App\Gateway\Paypal\PaypalGateway;
 use App\Gateway\Stripe\StripeGateway;
 use App\Gateway\Tracking;
 use App\Gateway\Wallet\WalletGateway;
-use App\Library\Benzina\Pump\Trait\ArrayPumpTrait;
-use App\Library\Benzina\Pump\Trait\DoctrinePumpTrait;
+use Goteo\BenzinaBundle\Pump\Trait\ArrayPumpTrait;
+use Goteo\BenzinaBundle\Pump\Trait\DoctrinePumpTrait;
 use App\Repository\Project\ProjectRepository;
 use App\Repository\TipjarRepository;
 use App\Repository\User\UserRepository;

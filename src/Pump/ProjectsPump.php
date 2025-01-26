@@ -1,102 +1,30 @@
 <?php
 
-namespace App\Library\Benzina\Pump;
+namespace Goteo\BenzinaBundle\Pump;
 
 use App\Entity\Accounting\Accounting;
 use App\Entity\Project\Project;
 use App\Entity\Project\ProjectStatus;
+use App\Entity\Project\ProjectTerritory;
 use App\Entity\User\User;
-use App\Library\Benzina\Pump\Trait\ArrayPumpTrait;
-use App\Library\Benzina\Pump\Trait\DoctrinePumpTrait;
+use Goteo\BenzinaBundle\Pump\Trait\ArrayPumpTrait;
+use Goteo\BenzinaBundle\Pump\Trait\DoctrinePumpTrait;
 use App\Repository\User\UserRepository;
+use App\Service\LocalizationService;
+use App\Service\Project\TerritoryService;
 use Doctrine\ORM\EntityManagerInterface;
 
 class ProjectsPump extends AbstractPump implements PumpInterface
 {
     use ArrayPumpTrait;
     use DoctrinePumpTrait;
-
-    private const PROJECT_KEYS = [
-        'id',
-        'name',
-        'subtitle',
-        'lang',
-        'currency',
-        'currency_rate',
-        'status',
-        'translate',
-        'progress',
-        'owner',
-        'node',
-        'amount',
-        'mincost',
-        'maxcost',
-        'days',
-        'num_investors',
-        'popularity',
-        'num_messengers',
-        'num_posts',
-        'created',
-        'updated',
-        'published',
-        'success',
-        'closed',
-        'passed',
-        'contract_name',
-        'contract_nif',
-        'phone',
-        'contract_email',
-        'address',
-        'zipcode',
-        'location',
-        'country',
-        'image',
-        'description',
-        'motivation',
-        'video',
-        'video_usubs',
-        'about',
-        'goal',
-        'related',
-        'spread',
-        'reward',
-        'category',
-        'keywords',
-        'media',
-        'media_usubs',
-        'currently',
-        'project_location',
-        'scope',
-        'resource',
-        'comment',
-        'contract_entity',
-        'contract_birthdate',
-        'entity_office',
-        'entity_name',
-        'entity_cif',
-        'post_address',
-        'secondary_address',
-        'post_zipcode',
-        'post_location',
-        'post_country',
-        'amount_users',
-        'amount_call',
-        'maxproj',
-        'analytics_id',
-        'facebook_pixel',
-        'social_commitment',
-        'social_commitment_description',
-        'execution_plan',
-        'sustainability_model',
-        'execution_plan_url',
-        'sustainability_model_url',
-        'sign_url',
-        'sign_url_action',
-    ];
+    use ProjectsPumpTrait;
 
     public function __construct(
         private UserRepository $userRepository,
         private EntityManagerInterface $entityManager,
+        private LocalizationService $localizationService,
+        private TerritoryService $territoryService,
     ) {}
 
     public function supports(mixed $batch): bool
@@ -115,16 +43,20 @@ class ProjectsPump extends AbstractPump implements PumpInterface
         $owners = $this->getOwners($batch);
 
         foreach ($batch as $key => $record) {
+            if (!$this->isPumpable($record)) {
+                continue;
+            }
+
             if (!\array_key_exists($record['owner'], $owners)) {
                 continue;
             }
 
-            if (empty($record['name'])) {
-                continue;
-            }
-
             $project = new Project();
+            $project->setTranslatableLocale($this->getProjectLang($record['lang']));
             $project->setTitle($record['name']);
+            $project->setSubtitle($record['subtitle']);
+            $project->setTerritory($this->getProjectTerritory($record));
+            $project->setDescription($record['description']);
             $project->setOwner($owners[$record['owner']]);
             $project->setStatus($this->getProjectStatus($record['status']));
             $project->setMigrated(true);
@@ -137,6 +69,20 @@ class ProjectsPump extends AbstractPump implements PumpInterface
 
         $this->entityManager->flush();
         $this->entityManager->clear();
+    }
+
+    private function isPumpable(array $record): bool
+    {
+        if (
+            empty($record['id'])
+            || empty($record['name'])
+            || empty($record['description'])
+            || \in_array($record['status'], [0, 1])
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -154,6 +100,32 @@ class ProjectsPump extends AbstractPump implements PumpInterface
         }
 
         return $owners;
+    }
+
+    private function getProjectLang(string $lang): string
+    {
+        if (empty($lang)) {
+            return $this->localizationService->getDefaultLanguage();
+        }
+
+        return $this->localizationService->getLanguage($lang);
+    }
+
+    private function getProjectTerritory(array $record): ProjectTerritory
+    {
+        if (empty($record['country'])) {
+            return ProjectTerritory::unknown();
+        }
+
+        if (!empty($record['project_location'])) {
+            $cleanLocation = self::cleanProjectLocation($record['project_location'], 2);
+
+            if ($cleanLocation !== '') {
+                return $this->territoryService->search($cleanLocation);
+            }
+        }
+
+        return $this->territoryService->search($record['country']);
     }
 
     private function getProjectStatus(int $status): ProjectStatus
