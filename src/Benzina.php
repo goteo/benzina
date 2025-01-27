@@ -20,11 +20,13 @@ class Benzina
      *
      * @return PumpInterface[]
      */
-    public function getPumpsFor(\Iterator $input): array
+    public function getPumpsFor(\Iterator $source): array
     {
-        $input->next();
-        $sample = $input->current();
-        $input->rewind();
+        $source->rewind();
+        $source->next();
+        
+        $sample = $source->current();
+        $source->rewind();
 
         $pumps = [];
         foreach ($this->pumps as $pump) {

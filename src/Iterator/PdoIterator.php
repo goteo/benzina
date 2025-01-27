@@ -40,27 +40,22 @@ class PdoIterator implements \Iterator
         $this->query->execute();
     }
 
-    public function current(): int
+    public function current(): mixed
     {
         return $this->result;
     }
 
     public function next(): void
     {
-        $result = $this->query->fetch(
+        $this->key++;
+
+        $this->result = $this->query->fetch(
             \PDO::FETCH_BOTH,
             \PDO::FETCH_ORI_ABS,
             $this->key
         );
 
-        $this->key++;
-
-        if ($result === false) {
-            $this->valid = false;
-            return;
-        }
-
-        $this->result;
+        $this->valid = (bool) $this->result;
     }
 
     public function key(): int
@@ -76,5 +71,6 @@ class PdoIterator implements \Iterator
     public function rewind(): void
     {
         $this->key = 0;
+        $this->query->execute();
     }
 }
