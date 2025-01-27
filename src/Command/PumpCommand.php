@@ -3,8 +3,8 @@
 namespace Goteo\BenzinaBundle\Command;
 
 use Goteo\BenzinaBundle\Benzina;
+use Goteo\BenzinaBundle\Iterator\PdoIterator;
 use Goteo\BenzinaBundle\Pump\PumpInterface;
-use Goteo\BenzinaBundle\Stream\PdoStream;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -40,14 +40,6 @@ class PumpCommand extends Command
         );
 
         $this->addOption(
-            'batch-size',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'The number of rows to process at once',
-            99
-        );
-
-        $this->addOption(
             'skip-pumped',
             null,
             InputOption::VALUE_NEGATABLE,
@@ -73,8 +65,6 @@ The <info>%command.name%</info> processes the data in the database table and sup
 You can avoid possible memory leaks caused by the Symfony profiler with the <info>no-debug</info> flag:
 
     <info>%command.full_name% --no-debug</info>
-
-If you still run out of memory, try smaller size batches.
 EOF
         );
     }
@@ -84,36 +74,29 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $batchSize = $input->getOption('batch-size');
+        $source = new PdoIterator($input->getOption('database'), $input->getArgument('table'));
+        $sourceSize = \iterator_count($source);
+        $sourceSection = new SymfonyStyle($input, $output->section());
 
-        $stream = new PdoStream(
-            $input->getOption('database'),
-            $input->getArgument('table'),
-            $batchSize
-        );
-        $streamSize = $stream->size();
-        $streamBatches = $streamSize / $batchSize;
-        $streamSection = new SymfonyStyle($input, $output->section());
-
-        if ($streamSize < 1) {
-            $streamSection->writeln('No data found at the given source. Skipping execution.');
+        if ($sourceSize < 1) {
+            $sourceSection->writeln('No data found at the given source. Skipping execution.');
 
             return Command::SUCCESS;
         }
 
-        $streamSection->writeln(sprintf('Streaming %d records (%d batches).', $streamSize, $streamBatches));
+        $sourceSection->writeln(sprintf('Sourcing %d records.', $sourceSize));
 
-        $pumps = $this->benzina->getPumpsFor($stream);
+        $pumps = $this->benzina->getPumpsFor($source);
         $pumpsCount = \count($pumps);
         $pumpsSection = new SymfonyStyle($input, $output->section());
 
         if ($pumpsCount < 1) {
-            $pumpsSection->writeln('No pumps support the streamed sample. Skipping execution.');
+            $pumpsSection->writeln('No pumps support the sourced sample. Skipping execution.');
 
             return Command::SUCCESS;
         }
 
-        $pumpsSection->writeln(sprintf('Streaming to %d pumps.', $pumpsCount));
+        $pumpsSection->writeln(sprintf('Pumping with %d pumps.', $pumpsCount));
         $pumpsSection->listing(\array_map(function (PumpInterface $pump) {
             return $pump::class;
         }, $pumps));
@@ -121,23 +104,21 @@ EOF
         $progressSection = $output->section();
         $progressSection->writeln("Pumping:");
         $progressBar = new ProgressBar($progressSection);
-        $progressBar->start($streamSize);
+        $progressBar->start($sourceSize);
 
-        while (!$stream->eof()) {
-            $batch = $stream->read();
-
+        $source->rewind();
+        foreach ($source as $record) {
             foreach ($pumps as $pump) {
                 $pump->setConfig([
                     'skip-pumped' => $input->getOption('skip-pumped'),
                 ]);
 
                 if (!$input->getOption('dry-run')) {
-                    $pump->pump($batch);
+                    $pump->pump($record);
                 }
             }
 
-            $streamed = $stream->tell();
-            $progressBar->setProgress($streamed);
+            $progressBar->advance();
         }
 
         $endSection = new SymfonyStyle($input, $output->section());
