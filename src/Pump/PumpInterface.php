@@ -22,16 +22,16 @@ interface PumpInterface
     public function getConfig(?string $key = null, mixed $default = null): mixed;
 
     /**
-     * Determines if a data batch is supported by this pump.
+     * Determines if the sample can be pumped.
      *
-     * @param mixed $batch A sample of the streamed records, e.g. rows from an user table
+     * @param mixed $batch A sample of the records, e.g: A row from an user table
      */
-    public function supports(mixed $batch): bool;
+    public function supports(mixed $sample): bool;
 
     /**
-     * Pump a data batch into a final destination.
+     * Pump a data record into a final destination.
      *
-     * @param mixed $batch The streamed records, e.g. rows from an user table
+     * @param mixed $record A pumped record, e.g: A row from an user table
      */
-    public function pump(mixed $batch): void;
+    public function pump(mixed $record): void;
 }

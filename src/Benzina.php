@@ -3,38 +3,34 @@
 namespace Goteo\BenzinaBundle;
 
 use Goteo\BenzinaBundle\Pump\PumpInterface;
-use Goteo\BenzinaBundle\Stream\StreamInterface;
 
 class Benzina
 {
     /** @var PumpInterface[] */
-    private array $availablePumps = [];
+    private array $pumps = [];
 
     public function __construct(
         iterable $instanceof,
     ) {
-        $this->availablePumps = \iterator_to_array($instanceof);
+        $this->pumps = \iterator_to_array($instanceof);
     }
 
     /**
-     * Get the Pumps that can process a sample in the stream data.
-     *
-     * @var mixed
+     * Get the Pumps that can process the records.
      *
      * @return PumpInterface[]
      */
-    public function getPumpsFor(StreamInterface $stream, int $sampleSize = 1): array
+    public function getPumpsFor(\Iterator $input): array
     {
-        $sample = $stream->read($sampleSize);
-        $stream->rewind();
+        $input->next();
+        $sample = $input->current();
+        $input->rewind();
 
         $pumps = [];
-        foreach ($this->availablePumps as $pump) {
-            if (!$pump->supports($sample)) {
-                continue;
+        foreach ($this->pumps as $pump) {
+            if ($pump->supports($sample)) {
+                $pumps[] = $pump;
             }
-
-            $pumps[] = $pump;
         }
 
         return $pumps;
