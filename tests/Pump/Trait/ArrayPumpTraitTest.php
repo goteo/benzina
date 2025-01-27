@@ -1,20 +1,26 @@
 <?php
 
-namespace Goteo\Tests\BenzinaBundle\Pump;
+namespace Goteo\Tests\BenzinaBundle\Pump\Trait;
 
 use Goteo\BenzinaBundle\Pump\Trait\ArrayPumpTrait;
 use PHPUnit\Framework\TestCase;
 
 class ArrayPumpTraitTest extends TestCase
 {
-    use ArrayPumpTrait;
+    /** @var ArrayPumpTrait */
+    private $mock;
+
+    public function setUp(): void
+    {
+        $this->mock = $this->getMockForTrait(ArrayPumpTrait::class);
+    }
 
     public function testHasAllKeysFalseOnMissingKeys()
     {
         $data = ['key1' => null, 'key2' => null];
         $keys = ['key1', 'key2', 'key3'];
 
-        $result = $this->hasAllKeys($data, $keys);
+        $result = $this->mock->hasAllKeys($data, $keys);
 
         $this->assertFalse($result);
     }
@@ -24,7 +30,7 @@ class ArrayPumpTraitTest extends TestCase
         $data = ['key1' => null, 'key2' => null, 'key3' => null];
         $keys = ['key1', 'key2'];
 
-        $result = $this->hasAllKeys($data, $keys);
+        $result = $this->mock->hasAllKeys($data, $keys);
 
         $this->assertTrue($result);
     }
