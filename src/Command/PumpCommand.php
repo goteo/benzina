@@ -22,7 +22,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class PumpCommand extends Command
 {
     public function __construct(
-        private Benzina $benzina,
+        private Benzina $benzina
     ) {
         parent::__construct();
     }
@@ -73,6 +73,8 @@ The <info>%command.name%</info> processes the data in the database table and sup
 You can avoid possible memory leaks caused by the Symfony profiler with the <info>no-debug</info> flag:
 
     <info>%command.full_name% --no-debug</info>
+
+If you still run out of memory, try smaller size batches.
 EOF
         );
     }
@@ -116,30 +118,15 @@ EOF
             return $pump::class;
         }, $pumps));
 
-        $streamedBatchesSection = $output->section();
-        $streamedBatchesSection->writeln("\tStreamed batches:");
-        $streamedBatches = new ProgressBar($streamedBatchesSection);
-        $streamedBatches->start($streamBatches);
-
-        $streamedRecordsSection = $output->section();
-        $streamedRecordsSection->writeln("\tStreamed records:");
-        $streamedRecords = new ProgressBar($streamedRecordsSection);
-        $streamedRecords->start($streamSize);
-
-        $memUsageSection = $output->section();
-        $memUsageSection->writeln("\tMemory usage:");
-        $memUsage = new ProgressBar($memUsageSection);
-        $memUsage->start($this->getMemoryLimit());
+        $progressSection = $output->section();
+        $progressSection->writeln("Pumping:");
+        $progressBar = new ProgressBar($progressSection);
+        $progressBar->start($streamSize);
 
         while (!$stream->eof()) {
-            \memory_reset_peak_usage();
-
             $batch = $stream->read();
 
-            $streamBatches = $streamBatches - 1;
-            $streamedBatches->advance();
-
-            foreach ($pumps as $key => $pump) {
+            foreach ($pumps as $pump) {
                 $pump->setConfig([
                     'skip-pumped' => $input->getOption('skip-pumped'),
                 ]);
@@ -147,31 +134,15 @@ EOF
                 if (!$input->getOption('dry-run')) {
                     $pump->pump($batch);
                 }
-
-                $memUsage->setProgress(\memory_get_peak_usage(false));
             }
 
             $streamed = $stream->tell();
-            $streamedRecords->setProgress($streamed);
+            $progressBar->setProgress($streamed);
         }
 
         $endSection = new SymfonyStyle($input, $output->section());
         $endSection->success('Data processed successfully!');
 
         return Command::SUCCESS;
-    }
-
-    private function getMemoryLimit(): int
-    {
-        $limit = \ini_get('memory_limit');
-        if (preg_match('/^(\d+)(.)$/', $limit, $matches)) {
-            if ($matches[2] == 'M') {
-                $limit = $matches[1] * 1024 * 1024; // nnnM -> nnn MB
-            } elseif ($matches[2] == 'K') {
-                $limit = $matches[1] * 1024; // nnnK -> nnn KB
-            }
-        }
-
-        return $limit;
     }
 }
