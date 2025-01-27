@@ -55,6 +55,14 @@ class PumpCommand extends Command
             true
         );
 
+        $this->addOption(
+            'dry-run',
+            null,
+            InputOption::VALUE_NEGATABLE,
+            'A dry run will perform all steps except the actual pumping',
+            false
+        );
+
         $this->addUsage('app:benzina:pump --no-debug user');
         $this->setHelp(
             <<<'EOF'
@@ -136,7 +144,9 @@ EOF
                     'skip-pumped' => $input->getOption('skip-pumped'),
                 ]);
 
-                $pump->pump($batch);
+                if (!$input->getOption('dry-run')) {
+                    $pump->pump($batch);
+                }
 
                 $memUsage->setProgress(\memory_get_peak_usage(false));
             }
