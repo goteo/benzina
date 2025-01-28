@@ -24,7 +24,7 @@ interface PumpInterface
     /**
      * Determines if the sample can be pumped.
      *
-     * @param mixed $batch A sample of the records, e.g: A row from an user table
+     * @param mixed $sample A sample of the records, e.g: A row from an user table
      */
     public function supports(mixed $sample): bool;
 

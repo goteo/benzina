@@ -55,7 +55,7 @@ class PumpCommand extends Command
             false
         );
 
-        $this->addUsage('app:benzina:pump --no-debug user');
+        $this->addUsage('benzina:pump --no-debug user');
         $this->setHelp(
             <<<'EOF'
 The <info>%command.name%</info> processes the data in the database table and supplies it to the supporting pumps:
@@ -102,7 +102,7 @@ EOF
         }, $pumps));
 
         $progressSection = $output->section();
-        $progressSection->writeln("Pumping:");
+        $progressSection->writeln("Pumping...");
         $progressBar = new ProgressBar($progressSection);
         $progressBar->start($sourceSize);
 
