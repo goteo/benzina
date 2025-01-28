@@ -1,6 +1,6 @@
 <?php
 
-namespace Goteo\BenzinaBundle\Benzina;
+namespace Goteo\BenzinaBundle\Pump;
 
 use Doctrine\DBAL\Logging\Middleware as LoggingMiddleware;
 use Doctrine\ORM\EntityManagerInterface;

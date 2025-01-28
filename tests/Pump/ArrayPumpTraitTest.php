@@ -1,8 +1,8 @@
 <?php
 
-namespace Goteo\Tests\BenzinaBundle\Pump\Trait;
+namespace Goteo\Tests\BenzinaBundle\Pump;
 
-use Goteo\BenzinaBundle\Pump\Trait\ArrayPumpTrait;
+use Goteo\BenzinaBundle\Pump\ArrayPumpTrait;
 use PHPUnit\Framework\TestCase;
 
 class ArrayPumpTraitTest extends TestCase
