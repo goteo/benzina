@@ -4,7 +4,6 @@ namespace Goteo\Benzina\Command;
 
 use Goteo\Benzina\Benzina;
 use Goteo\Benzina\Iterator\PdoIterator;
-use Goteo\Benzina\Pump\PumpInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -98,9 +97,7 @@ EOF
         }
 
         $pumpsSection->writeln(sprintf('Pumping with %d pumps.', $pumpsCount));
-        $pumpsSection->listing(\array_map(function (PumpInterface $pump) {
-            return $pump::class;
-        }, $pumps));
+        $pumpsSection->listing(\array_map(fn($p) => $p::class, $pumps));
 
         $progressSection = $output->section();
         $progressSection->writeln("Pumping...");
@@ -130,9 +127,11 @@ EOF
 
         $endSection = new SymfonyStyle($input, $output->section());
         $endSection->write([
+            "\n\n",
             \sprintf('Time: %sms, Memory: %s bytes', $pumped->getDuration(), $pumped->getMemory()),
+            "\n\n",
             \sprintf('<fg=black;bg=green>OK (%d pumps, %d records)</>', $pumpsCount, $sourceSize)
-        ], true);
+        ]);
 
         return Command::SUCCESS;
     }
