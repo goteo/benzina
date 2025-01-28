@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 #[AsCommand(
     name: 'benzina:pump',
@@ -107,6 +108,10 @@ EOF
         $progressBar->start($sourceSize);
 
         $source->rewind();
+
+        $stopwatch = new Stopwatch(true);
+        $stopwatch->start('PUMPED');
+
         foreach ($source as $record) {
             foreach ($pumps as $pump) {
                 $pump->setConfig([
@@ -121,8 +126,13 @@ EOF
             $progressBar->advance();
         }
 
+        $pumped = $stopwatch->stop('PUMPED');
+
         $endSection = new SymfonyStyle($input, $output->section());
-        $endSection->success('Data processed successfully!');
+        $endSection->write([
+            \sprintf('Time: %sms, Memory: %s bytes', $pumped->getDuration(), $pumped->getMemory()),
+            \sprintf('<fg=black;bg=green>OK (%d pumps, %d records)</>', $pumpsCount, $sourceSize)
+        ], true);
 
         return Command::SUCCESS;
     }
