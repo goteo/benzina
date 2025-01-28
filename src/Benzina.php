@@ -1,8 +1,8 @@
 <?php
 
-namespace Goteo\BenzinaBundle;
+namespace Goteo\Benzina;
 
-use Goteo\BenzinaBundle\Pump\PumpInterface;
+use Goteo\Benzina\Pump\PumpInterface;
 
 class Benzina
 {

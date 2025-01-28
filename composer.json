@@ -1,7 +1,7 @@
 {
     "type": "symfony-bundle",
-    "name": "goteo/benzina-bundle",
-    "description": "Benzina is the migration tool used to transform v3 records into v4",
+    "name": "goteo/benzina",
+    "description": "Migration tool to pump v3 data into a v4 schema",
     "license": "MIT",
     "minimum-stability": "stable",
     "prefer-stable": true,
@@ -27,12 +27,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Goteo\\BenzinaBundle\\": "src/"
+            "Goteo\\Benzina\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Goteo\\Tests\\BenzinaBundle\\": "tests/"
+            "Goteo\\Tests\\Benzina\\": "tests/"
         }
     },
     "scripts": {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Goteo\BenzinaBundle;
+namespace Goteo\Benzina;
 
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;

@@ -1,6 +1,6 @@
 <?php
 
-use Goteo\BenzinaBundle\Kernel;
+use Goteo\Benzina\Kernel;
 
 require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
 

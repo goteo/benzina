@@ -2,7 +2,7 @@
 
 namespace Goteo\Tests\BenzinaBundle\Pump;
 
-use Goteo\BenzinaBundle\Pump\ArrayPumpTrait;
+use Goteo\Benzina\Pump\ArrayPumpTrait;
 use PHPUnit\Framework\TestCase;
 
 class ArrayPumpTraitTest extends TestCase

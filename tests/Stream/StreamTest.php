@@ -2,7 +2,7 @@
 
 namespace Goteo\Tests\BenzinaBundle\Stream;
 
-use Goteo\BenzinaBundle\Stream\Stream;
+use Goteo\Benzina\Stream\Stream;
 use PHPUnit\Framework\TestCase;
 
 class StreamTest extends TestCase

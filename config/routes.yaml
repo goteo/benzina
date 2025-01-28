@@ -1,5 +1,5 @@
 controllers:
     resource:
         path: ../src/Controller/
-        namespace: Goteo\BenzinaBundle\Controller
+        namespace: Goteo\Benzina\Controller
     type: attribute

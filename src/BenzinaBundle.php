@@ -1,8 +1,8 @@
 <?php
 
-namespace Goteo\BenzinaBundle;
+namespace Goteo\Benzina;
 
-use Goteo\BenzinaBundle\Pump\PumpInterface;
+use Goteo\Benzina\Pump\PumpInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;

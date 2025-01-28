@@ -1,6 +1,6 @@
 <?php
 
-namespace Goteo\BenzinaBundle\Stream;
+namespace Goteo\Benzina\Stream;
 
 class Stream implements StreamInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Goteo\BenzinaBundle\Pump;
+namespace Goteo\Benzina\Pump;
 
 trait ArrayPumpTrait
 {

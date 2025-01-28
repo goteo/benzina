@@ -1,6 +1,6 @@
 <?php
 
-namespace Goteo\BenzinaBundle\Iterator;
+namespace Goteo\Benzina\Iterator;
 
 class PdoIterator implements \Iterator
 {

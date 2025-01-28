@@ -1,10 +1,10 @@
 <?php
 
-namespace Goteo\BenzinaBundle\Command;
+namespace Goteo\Benzina\Command;
 
-use Goteo\BenzinaBundle\Benzina;
-use Goteo\BenzinaBundle\Iterator\PdoIterator;
-use Goteo\BenzinaBundle\Pump\PumpInterface;
+use Goteo\Benzina\Benzina;
+use Goteo\Benzina\Iterator\PdoIterator;
+use Goteo\Benzina\Pump\PumpInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
