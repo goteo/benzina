@@ -40,14 +40,6 @@ class PumpCommand extends Command
         );
 
         $this->addOption(
-            'skip-pumped',
-            null,
-            InputOption::VALUE_NEGATABLE,
-            'Skips feeding already pumped records in a batch',
-            true
-        );
-
-        $this->addOption(
             'dry-run',
             null,
             InputOption::VALUE_NEGATABLE,
@@ -111,10 +103,6 @@ EOF
 
         foreach ($source as $record) {
             foreach ($pumps as $pump) {
-                $pump->setConfig([
-                    'skip-pumped' => $input->getOption('skip-pumped'),
-                ]);
-
                 if (!$input->getOption('dry-run')) {
                     $pump->pump($record);
                 }
