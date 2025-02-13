@@ -3,7 +3,7 @@
 namespace Goteo\Benzina\Command;
 
 use Goteo\Benzina\Benzina;
-use Goteo\Benzina\Iterator\PdoIterator;
+use Goteo\Benzina\Source\PdoSource;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -66,8 +66,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $source = new PdoIterator($input->getOption('database'), $input->getArgument('table'));
-        $sourceSize = \iterator_count($source);
+        $source = new PdoSource($input->getOption('database'), $input->getArgument('table'));
+        $sourceSize = $source->size();
         $sourceSection = new SymfonyStyle($input, $output->section());
 
         if ($sourceSize < 1) {
@@ -96,12 +96,10 @@ EOF
         $progressBar = new ProgressBar($progressSection);
         $progressBar->start($sourceSize);
 
-        $source->rewind();
-
         $stopwatch = new Stopwatch(true);
         $stopwatch->start('PUMPED');
 
-        foreach ($source as $record) {
+        foreach ($source->records() as $record) {
             foreach ($pumps as $pump) {
                 if (!$input->getOption('dry-run')) {
                     $pump->pump($record);

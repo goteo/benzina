@@ -3,6 +3,7 @@
 namespace Goteo\Benzina;
 
 use Goteo\Benzina\Pump\PumpInterface;
+use Goteo\Benzina\Source\SourceInterface;
 
 class Benzina
 {
@@ -20,13 +21,9 @@ class Benzina
      *
      * @return PumpInterface[]
      */
-    public function getPumpsFor(\Iterator $source): array
+    public function getPumpsFor(SourceInterface $source): array
     {
-        $source->rewind();
-        $source->next();
-        
-        $sample = $source->current();
-        $source->rewind();
+        $sample = $source->sample();
 
         $pumps = [];
         foreach ($this->pumps as $pump) {
