@@ -32,6 +32,14 @@ class PumpCommand extends Command
         $this->addArgument('table', InputArgument::REQUIRED);
 
         $this->addOption(
+            'offset',
+            null,
+            InputOption::VALUE_OPTIONAL,
+            'An offset to start sourcing records from',
+            0
+        );
+
+        $this->addOption(
             'database',
             null,
             InputOption::VALUE_OPTIONAL,
@@ -66,7 +74,12 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $source = new PdoSource($input->getOption('database'), $input->getArgument('table'));
+        $source = new PdoSource(
+            $input->getOption('database'),
+            $input->getArgument('table'),
+            $input->getOption('offset')
+        );
+
         $sourceSize = $source->size();
         $sourceSection = new SymfonyStyle($input, $output->section());
 
