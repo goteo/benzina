@@ -6,14 +6,14 @@ interface SourceInterface
 {
     /**
      * Obtain the records from the source.
-     * 
+     *
      * @return \Traversable A traversable collection of records
      */
     public function records(): \Traversable;
 
     /**
      * Obtain a single sample record from the source.
-     * 
+     *
      * @return mixed The sample record data
      */
     public function sample(): mixed;

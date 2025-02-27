@@ -13,7 +13,7 @@ abstract class AbstractPump implements PumpInterface
 
     public function getConfig(?string $key = null, mixed $default = null): mixed
     {
-        if ($key !== null) {
+        if (null !== $key) {
             return \array_key_exists($key, $this->config)
                 ? $this->config[$key]
                 : $default;

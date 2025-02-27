@@ -21,7 +21,7 @@ trait DoctrinePumpTrait
         $entityManager = clone $entityManager;
 
         $middlewares = $entityManager->getConnection()->getConfiguration()->getMiddlewares();
-        $middlewares = \array_filter($middlewares, fn($m) => !$m instanceof LoggingMiddleware);
+        $middlewares = \array_filter($middlewares, fn ($m) => !$m instanceof LoggingMiddleware);
 
         $entityManager->getConnection()->getConfiguration()->setMiddlewares($middlewares);
 

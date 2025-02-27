@@ -43,7 +43,7 @@ class Stream implements StreamInterface
             throw new \RuntimeException('Length parameter cannot be negative');
         }
 
-        if ($size === 0) {
+        if (0 === $size) {
             return '';
         }
 
@@ -53,7 +53,7 @@ class Stream implements StreamInterface
             throw new \RuntimeException(self::MESSAGE_ERROR_UNABLE_TO_READ, 0, $e);
         }
 
-        if ($string === false) {
+        if (false === $string) {
             throw new \RuntimeException(self::MESSAGE_ERROR_UNABLE_TO_READ);
         }
 

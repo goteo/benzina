@@ -2,8 +2,6 @@
 
 namespace Goteo\Benzina\Source;
 
-use Traversable;
-
 class PdoSource implements SourceInterface
 {
     private \PDOStatement $countStmt;
@@ -41,7 +39,7 @@ class PdoSource implements SourceInterface
         );
     }
 
-    public function records(): Traversable
+    public function records(): \Traversable
     {
         $this->selectStmt->execute();
 
