@@ -115,6 +115,7 @@ EOF
         $context = [
             'source' => $source,
             'options' => $input->getOptions(),
+            'arguments' => $input->getArguments(),
             'previous_record' => null,
         ];
 

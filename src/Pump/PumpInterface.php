@@ -14,8 +14,12 @@ interface PumpInterface
     /**
      * Pump a data record into a final destination.
      *
-     * @param mixed                                                                                  $record  A pumped record, e.g: A row from an user table
-     * @param array{source: SourceInterface, options: array<string, mixed>, previous_record?: mixed} $context
+     * @param mixed $record A pumped record, e.g: A row from an user table
+     * @param array{
+     *  source: \Goteo\Benzina\Source\SourceInterface,
+     *  options: array<string, mixed>,
+     *  arguments: array<string, mixed>,
+     *  previous_record?: mixed} $context
      */
     public function pump(mixed $record, array $context): void;
 }
