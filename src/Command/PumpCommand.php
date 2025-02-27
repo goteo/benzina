@@ -22,7 +22,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 class PumpCommand extends Command
 {
     public function __construct(
-        private Benzina $benzina
+        private Benzina $benzina,
     ) {
         parent::__construct();
     }
@@ -102,22 +102,28 @@ EOF
         }
 
         $pumpsSection->writeln(sprintf('Pumping with %d pumps.', $pumpsCount));
-        $pumpsSection->listing(\array_map(fn($p) => $p::class, $pumps));
+        $pumpsSection->listing(\array_map(fn ($p) => $p::class, $pumps));
 
         $progressSection = $output->section();
-        $progressSection->writeln("Pumping...");
+        $progressSection->writeln('Pumping...');
         $progressBar = new ProgressBar($progressSection);
         $progressBar->start($sourceSize);
 
         $stopwatch = new Stopwatch(true);
         $stopwatch->start('PUMPED');
 
+        $context = [
+            'source' => $source,
+            'options' => $input->getOptions(),
+            'previous_record' => null,
+        ];
+
         foreach ($source->records() as $record) {
             foreach ($pumps as $pump) {
-                if (!$input->getOption('dry-run')) {
-                    $pump->pump($record);
-                }
+                $pump->pump($record, $context);
             }
+
+            $context = [...$context, 'previous_record' => $record];
 
             $progressBar->advance();
         }
@@ -129,7 +135,7 @@ EOF
             "\n\n",
             \sprintf('Time: %sms, Memory: %s bytes', $pumped->getDuration(), $pumped->getMemory()),
             "\n\n",
-            \sprintf('<fg=black;bg=green>OK (%d pumps, %d records)</>', $pumpsCount, $sourceSize)
+            \sprintf('<fg=black;bg=green>OK (%d pumps, %d records)</>', $pumpsCount, $sourceSize),
         ]);
 
         return Command::SUCCESS;

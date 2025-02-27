@@ -28,8 +28,15 @@ trait DoctrinePumpTrait
         $this->entityManager = $entityManager;
     }
 
-    public function persist(object $object): void
+    public function persist(object $object, array $context): void
     {
+        if (
+            \array_key_exists('dry-run', $context['options'])
+            && true === $context['options']['dry-run']
+        ) {
+            return;
+        }
+
         $this->entityManager->persist($object);
 
         $this->entityManager->flush();
