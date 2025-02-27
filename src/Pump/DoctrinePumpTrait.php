@@ -8,6 +8,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 
 trait DoctrinePumpTrait
 {
+    use ContextAwareTrait;
+
     private EntityManagerInterface $entityManager;
 
     public function getEntityManager(): EntityManagerInterface
@@ -30,10 +32,7 @@ trait DoctrinePumpTrait
 
     public function persist(object $object, array $context): void
     {
-        if (
-            \array_key_exists('dry-run', $context['options'])
-            && true === $context['options']['dry-run']
-        ) {
+        if ($this->isDryRun($context)) {
             return;
         }
 
