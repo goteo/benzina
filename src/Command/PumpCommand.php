@@ -29,35 +29,31 @@ class PumpCommand extends Command
 
     protected function configure(): void
     {
-        $this->addArgument('table', InputArgument::REQUIRED);
-
-        $this->addOption(
-            'offset',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'An offset to start sourcing records from',
-            0
-        );
-
-        $this->addOption(
-            'database',
-            null,
-            InputOption::VALUE_OPTIONAL,
-            'The address of the database to read from',
-            'mysql://goteo:goteo@mariadb:3306/benzina'
-        );
-
-        $this->addOption(
-            'dry-run',
-            null,
-            InputOption::VALUE_NEGATABLE,
-            'A dry run will perform all steps except the actual pumping',
-            false
-        );
-
-        $this->addUsage('benzina:pump --no-debug user');
-        $this->setHelp(
-            <<<'EOF'
+        $this
+            ->addArgument('table', InputArgument::REQUIRED)
+            ->addOption(
+                'offset',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'An offset to start sourcing records from',
+                0
+            )
+            ->addOption(
+                'database',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The address of the database to read from',
+                'mysql://goteo:goteo@mariadb:3306/benzina'
+            )
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NEGATABLE,
+                'A dry run will perform all steps except the actual pumping',
+                false
+            )
+            ->addUsage('benzina:pump --no-debug user')
+            ->setHelp(<<<'EOF'
 The <info>%command.name%</info> processes the data in the database table and supplies it to the supporting pumps:
 
     <info>%command.full_name%</info>
@@ -65,8 +61,7 @@ The <info>%command.name%</info> processes the data in the database table and sup
 You can avoid possible memory leaks caused by the Symfony profiler with the <info>no-debug</info> flag:
 
     <info>%command.full_name% --no-debug</info>
-EOF
-        );
+EOF);
     }
 
     /**
@@ -74,6 +69,8 @@ EOF
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $io = new SymfonyStyle($input, $output);
+
         $source = new PdoSource(
             $input->getOption('database'),
             $input->getArgument('table'),
@@ -81,33 +78,28 @@ EOF
         );
 
         $sourceSize = $source->size();
-        $sourceSection = new SymfonyStyle($input, $output->section());
 
         if ($sourceSize < 1) {
-            $sourceSection->writeln('No data found at the given source. Skipping execution.');
-
+            $io->writeln('No data found at the given source. Skipping execution.');
             return Command::SUCCESS;
         }
 
-        $sourceSection->writeln(sprintf('Sourcing %d records.', $sourceSize));
+        $io->writeln(sprintf('Sourcing %d records.', $sourceSize));
 
         $pumps = $this->benzina->getPumpsFor($source);
         $pumpsCount = \count($pumps);
-        $pumpsSection = new SymfonyStyle($input, $output->section());
 
         if ($pumpsCount < 1) {
-            $pumpsSection->writeln('No pumps support the sourced sample. Skipping execution.');
-
+            $io->writeln('No pumps support the sourced sample. Skipping execution.');
             return Command::SUCCESS;
         }
 
-        $pumpsSection->writeln(sprintf('Pumping with %d pumps.', $pumpsCount));
-        $pumpsSection->listing(\array_map(fn ($p) => $p::class, $pumps));
+        $io->writeln(sprintf('Pumping with %d pumps.', $pumpsCount));
+        $io->listing(\array_map(static fn($p) => $p::class, $pumps));
 
-        $progressSection = $output->section();
-        $progressSection->writeln('Pumping...');
-        $progressBar = new ProgressBar($progressSection);
-        $progressBar->start($sourceSize);
+        $progressBar = new ProgressBar($output, $sourceSize);
+        $progressBar->setRedrawFrequency(max(1, (int) $sourceSize / 100));
+        $progressBar->start();
 
         $stopwatch = new Stopwatch(true);
         $stopwatch->start('PUMPED');
@@ -124,20 +116,21 @@ EOF
                 $pump->pump($record, $context);
             }
 
-            $context = [...$context, 'previous_record' => $record];
+            $context['previous_record'] = $record;
 
             $progressBar->advance();
         }
 
         $pumped = $stopwatch->stop('PUMPED');
 
-        $endSection = new SymfonyStyle($input, $output->section());
-        $endSection->write([
-            "\n\n",
-            \sprintf('Time: %sms, Memory: %s bytes', $pumped->getDuration(), $pumped->getMemory()),
-            "\n\n",
-            \sprintf('<fg=black;bg=green>OK (%d pumps, %d records)</>', $pumpsCount, $sourceSize),
-        ]);
+        $io->newLine(2);
+        $io->writeln(sprintf(
+            'Time: %sms, Memory: %s bytes',
+            $pumped->getDuration(),
+            $pumped->getMemory()
+        ));
+
+        $io->success(sprintf('OK (%d pumps, %d records)', $pumpsCount, $sourceSize));
 
         return Command::SUCCESS;
     }
