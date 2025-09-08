@@ -81,6 +81,7 @@ EOF);
 
         if ($sourceSize < 1) {
             $io->writeln('No data found at the given source. Skipping execution.');
+
             return Command::SUCCESS;
         }
 
@@ -91,11 +92,12 @@ EOF);
 
         if ($pumpsCount < 1) {
             $io->writeln('No pumps support the sourced sample. Skipping execution.');
+
             return Command::SUCCESS;
         }
 
         $io->writeln(sprintf('Pumping with %d pumps.', $pumpsCount));
-        $io->listing(\array_map(static fn($p) => $p::class, $pumps));
+        $io->listing(\array_map(static fn ($p) => $p::class, $pumps));
 
         $progressBar = new ProgressBar($output, $sourceSize);
         $progressBar->setRedrawFrequency(max(1, (int) $sourceSize / 100));
@@ -105,6 +107,7 @@ EOF);
         $stopwatch->start('PUMPED');
 
         $context = [
+            'count' => 0,
             'source' => $source,
             'options' => $input->getOptions(),
             'arguments' => $input->getArguments(),
@@ -116,6 +119,7 @@ EOF);
                 $pump->pump($record, $context);
             }
 
+            $context['count'] = $context['count']++;
             $context['previous_record'] = $record;
 
             $progressBar->advance();

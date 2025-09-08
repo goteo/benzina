@@ -6,6 +6,7 @@ trait ContextAwareTrait
 {
     /**
      * @param array{
+     *  count: int,
      *  source: \Goteo\Benzina\Source\SourceInterface,
      *  options: array<string, mixed>,
      *  arguments: array<string, mixed>,
@@ -20,5 +21,18 @@ trait ContextAwareTrait
         }
 
         return false;
+    }
+
+    /**
+     * @param array{
+     *  count: int,
+     *  source: \Goteo\Benzina\Source\SourceInterface,
+     *  options: array<string, mixed>,
+     *  arguments: array<string, mixed>,
+     *  previous_record?: mixed} $context
+     */
+    private function isAtEnd(array $context): bool
+    {
+        return $context['count'] === $context['source']->size() - 1;
     }
 }
