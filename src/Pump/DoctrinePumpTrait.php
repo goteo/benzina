@@ -4,6 +4,7 @@ namespace Goteo\Benzina\Pump;
 
 use Doctrine\DBAL\Logging\Middleware as LoggingMiddleware;
 use Doctrine\ORM\EntityManagerInterface;
+use DoctrineBatchUtils\BatchProcessing\SimpleBatchIteratorAggregate;
 use Symfony\Contracts\Service\Attribute\Required;
 
 trait DoctrinePumpTrait
@@ -11,6 +12,8 @@ trait DoctrinePumpTrait
     use ContextAwareTrait;
 
     private EntityManagerInterface $entityManager;
+
+    private array $toBePumped;
 
     public function getEntityManager(): EntityManagerInterface
     {
@@ -36,9 +39,30 @@ trait DoctrinePumpTrait
             return;
         }
 
-        $this->entityManager->persist($object);
+        $this->toBePumped[] = $object;
 
-        $this->entityManager->flush();
-        $this->entityManager->clear();
+        if ($this->isAtEnd($context)) {
+            $this->doPersist();
+        }
+    }
+
+    public function doPersist()
+    {
+        $toBePumped = $this->toBePumped;
+        $entityManager = $this->getEntityManager();
+
+        $iterable = SimpleBatchIteratorAggregate::fromTraversableResult(
+            call_user_func(static function () use ($entityManager, $toBePumped) {
+                foreach ($toBePumped as $object) {
+                    $entityManager->persist($object);
+
+                    yield $object;
+                }
+            }),
+            $entityManager,
+            100,
+        );
+
+        \iterator_to_array($iterable);
     }
 }

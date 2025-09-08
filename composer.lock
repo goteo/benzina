@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "016c9bb4f0c1e24ea320c2a4886a8ca5",
+    "content-hash": "d6fd4d5ccbdf78a408a9ef5c06bfcf2d",
     "packages": [
         {
             "name": "doctrine/collections",
@@ -756,6 +756,70 @@
                 }
             ],
             "time": "2024-11-01T21:49:07+00:00"
+        },
+        {
+            "name": "ocramius/doctrine-batch-utils",
+            "version": "2.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Ocramius/DoctrineBatchUtils.git",
+                "reference": "036a6ae14da708b1710402510ba5cbbc0bbc21c8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Ocramius/DoctrineBatchUtils/zipball/036a6ae14da708b1710402510ba5cbbc0bbc21c8",
+                "reference": "036a6ae14da708b1710402510ba5cbbc0bbc21c8",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/orm": "^3.3.1",
+                "doctrine/persistence": "^4.0.0",
+                "php": "~8.2.0 || ~8.3.0 || ~8.4.0"
+            },
+            "require-dev": {
+                "doctrine/coding-standard": "^12.0.0",
+                "doctrine/dbal": "^4.2.2",
+                "phpunit/phpunit": "^9.6.22",
+                "psalm/plugin-phpunit": "^0.19.2",
+                "roave/infection-static-analysis-plugin": "^1.36.0",
+                "vimeo/psalm": "^6.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "DoctrineBatchUtils\\": "src/DoctrineBatchUtils"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marco Pivetta",
+                    "email": "ocramius@gmail.com",
+                    "homepage": "http://ocramius.github.io/"
+                }
+            ],
+            "description": "A set of utilities to operate with Doctrine ORM's batch processing functionality",
+            "homepage": "https://github.com/Ocramius/DoctrineBatchUtils",
+            "keywords": [
+                "batch processing",
+                "doctrine",
+                "doctrine2",
+                "orm"
+            ],
+            "support": {
+                "issues": "https://github.com/Ocramius/DoctrineBatchUtils/issues",
+                "source": "https://github.com/Ocramius/DoctrineBatchUtils/tree/2.10.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/Ocramius",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-02-05T10:49:30+00:00"
         },
         {
             "name": "psr/cache",
