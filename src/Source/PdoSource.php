@@ -11,6 +11,7 @@ class PdoSource implements SourceInterface
     public function __construct(
         string $database,
         private string $tablename,
+        private int $limit = 2147483647,
         private int $offset = 0,
     ) {
         $parsedUrl = parse_url($database);
@@ -30,11 +31,11 @@ class PdoSource implements SourceInterface
         );
 
         $this->countStmt = $pdo->prepare(
-            "SELECT COUNT(*) FROM (SELECT * FROM `$tablename` LIMIT 18446744073709551615 OFFSET $offset) AS count"
+            "SELECT COUNT(*) FROM (SELECT * FROM `$tablename` LIMIT $limit OFFSET $offset) AS count"
         );
 
         $this->selectStmt = $pdo->prepare(
-            "SELECT * FROM `$tablename` OFFSET $offset ROWS",
+            "SELECT * FROM `$tablename` LIMIT $limit OFFSET $offset ROWS",
             [\PDO::ATTR_CURSOR => \PDO::CURSOR_SCROLL],
         );
     }

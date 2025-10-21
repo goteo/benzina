@@ -32,6 +32,13 @@ class PumpCommand extends Command
         $this
             ->addArgument('table', InputArgument::REQUIRED)
             ->addOption(
+                'limit',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Max records that can be pumped for the run',
+                2147483647
+            )
+            ->addOption(
                 'offset',
                 null,
                 InputOption::VALUE_OPTIONAL,
@@ -74,6 +81,7 @@ EOF);
         $source = new PdoSource(
             $input->getOption('database'),
             $input->getArgument('table'),
+            $input->getOption('limit'),
             $input->getOption('offset')
         );
 
