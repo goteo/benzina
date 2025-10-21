@@ -12,7 +12,7 @@ trait DoctrinePumpTrait
 
     private EntityManagerInterface $entityManager;
 
-    private bool $preventFlushAndClear;
+    private bool $preventFlushAndClear = false;
 
     public function getEntityManager(): EntityManagerInterface
     {
@@ -22,21 +22,19 @@ trait DoctrinePumpTrait
     #[Required()]
     public function setEntityManager(EntityManagerInterface $entityManager): void
     {
-        $entityManager = clone $entityManager;
-
         $middlewares = $entityManager->getConnection()->getConfiguration()->getMiddlewares();
-        $middlewares = \array_filter($middlewares, fn ($m) => !$m instanceof LoggingMiddleware);
-
+        $middlewares = \array_filter($middlewares, fn($m) => !$m instanceof LoggingMiddleware);
         $entityManager->getConnection()->getConfiguration()->setMiddlewares($middlewares);
+
+        $entityManager->getMetadataFactory()->getAllMetadata();
 
         $this->entityManager = $entityManager;
     }
 
-    public function setPreventFlushAndClear(bool $preventFlushAndClear): void
-    {
-        $this->preventFlushAndClear = $preventFlushAndClear;
-    }
-
+    /**
+     * Persist an entity, flush and clear immediately.
+     * Fastest possible in Doctrine ORM 3 for complex graphs.
+     */
     public function persist(object $object, array $context): void
     {
         if ($this->isDryRun($context)) {
@@ -51,5 +49,10 @@ trait DoctrinePumpTrait
 
         $this->entityManager->flush();
         $this->entityManager->clear();
+    }
+
+    public function setPreventFlushAndClear(bool $prevent): void
+    {
+        $this->preventFlushAndClear = $prevent;
     }
 }
