@@ -35,8 +35,15 @@ class PumpPdoCommand extends Command
                 'offset',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'An offset to start sourcing records from',
+                'An index to start sourcing records from',
                 0
+            )
+            ->addOption(
+                'limit',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'A max to stop sourcing records at',
+                null
             )
             ->addOption(
                 'database',
@@ -74,7 +81,8 @@ EOF);
         $source = new PdoSource(
             $input->getOption('database'),
             $input->getArgument('table'),
-            $input->getOption('offset')
+            $input->getOption('offset'),
+            $input->getOption('limit')
         );
 
         $sourceSize = $source->size();
