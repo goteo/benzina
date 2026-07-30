@@ -119,7 +119,7 @@ EOF);
                 $pump->pump($record, $context);
             }
 
-            $context['count'] = $context['count']++;
+            $context['count']++;
             $context['previous_record'] = $record;
 
             $progressBar->advance();
