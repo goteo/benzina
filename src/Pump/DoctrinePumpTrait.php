@@ -14,6 +14,9 @@ trait DoctrinePumpTrait
 
     private bool $preventFlushAndClear = false;
 
+    private int $flushBatchSize = 16;
+    private int $flushBatchCount = 0;
+
     public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
@@ -31,10 +34,16 @@ trait DoctrinePumpTrait
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * Persist an entity, flush and clear immediately.
-     * Fastest possible in Doctrine ORM 3 for complex graphs.
-     */
+    public function setPreventFlushAndClear(bool $preventFlushAndClear): void
+    {
+        $this->preventFlushAndClear = $preventFlushAndClear;
+    }
+
+    public function setFlushBatchSize(int $flushBatchSize): void
+    {
+        $this->flushBatchSize = $flushBatchSize;
+    }
+
     public function persist(object $object, array $context): void
     {
         if ($this->isDryRun($context)) {
@@ -47,12 +56,11 @@ trait DoctrinePumpTrait
             return;
         }
 
-        $this->entityManager->flush();
-        $this->entityManager->clear();
-    }
+        if (++$this->flushBatchCount >= $this->flushBatchSize || $this->isAtEnd($context)) {
+            $this->entityManager->flush();
+            $this->entityManager->clear();
 
-    public function setPreventFlushAndClear(bool $prevent): void
-    {
-        $this->preventFlushAndClear = $prevent;
+            $this->flushBatchCount = 0;
+        }
     }
 }

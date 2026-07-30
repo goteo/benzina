@@ -16,10 +16,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 #[AsCommand(
-    name: 'benzina:pump',
-    description: 'Pump records from a v3 database into a v4 schema.',
+    name: 'benzina:pump:pdo',
+    description: 'Pump records from a PDO data source.',
 )]
-class PumpCommand extends Command
+class PumpPdoCommand extends Command
 {
     public function __construct(
         private Benzina $benzina,
@@ -32,25 +32,25 @@ class PumpCommand extends Command
         $this
             ->addArgument('table', InputArgument::REQUIRED)
             ->addOption(
-                'limit',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Max records that can be pumped for the run',
-                2147483647
-            )
-            ->addOption(
                 'offset',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'An offset to start sourcing records from',
+                'An index to start sourcing records from',
                 0
+            )
+            ->addOption(
+                'limit',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'A max to stop sourcing records at',
+                null
             )
             ->addOption(
                 'database',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'The address of the database to read from',
-                'mysql://goteo:goteo@mariadb:3306/benzina'
+                'mysql://goteo:goteo@mariadb:3306/goteo3'
             )
             ->addOption(
                 'dry-run',
@@ -81,8 +81,8 @@ EOF);
         $source = new PdoSource(
             $input->getOption('database'),
             $input->getArgument('table'),
-            $input->getOption('limit'),
-            $input->getOption('offset')
+            $input->getOption('offset'),
+            $input->getOption('limit')
         );
 
         $sourceSize = $source->size();
@@ -116,6 +116,7 @@ EOF);
 
         $context = [
             'count' => 0,
+            'size' => $sourceSize,
             'source' => $source,
             'options' => $input->getOptions(),
             'arguments' => $input->getArguments(),
@@ -123,11 +124,12 @@ EOF);
         ];
 
         foreach ($source->records() as $record) {
+            ++$context['count'];
+
             foreach ($pumps as $pump) {
                 $pump->pump($record, $context);
             }
 
-            $context['count'] = $context['count']++;
             $context['previous_record'] = $record;
 
             $progressBar->advance();

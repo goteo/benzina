@@ -11,8 +11,8 @@ class PdoSource implements SourceInterface
     public function __construct(
         string $database,
         private string $tablename,
-        private int $limit = 2147483647,
         private int $offset = 0,
+        private int $limit = 9223372036854775807
     ) {
         $parsedUrl = parse_url($database);
         $dbdata = [
@@ -35,16 +35,18 @@ class PdoSource implements SourceInterface
         );
 
         $this->selectStmt = $pdo->prepare(
-            "SELECT * FROM `$tablename` LIMIT $limit OFFSET $offset ROWS",
+            "SELECT * FROM `$tablename` LIMIT $limit OFFSET $offset",
             [\PDO::ATTR_CURSOR => \PDO::CURSOR_SCROLL],
         );
     }
 
-    public function records(): \Traversable
+    public function records(): \Generator
     {
         $this->selectStmt->execute();
 
-        return $this->selectStmt;
+        while ($row = $this->selectStmt->fetch()) {
+            yield $row;
+        }
     }
 
     public function sample(): mixed
