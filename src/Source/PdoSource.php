@@ -34,7 +34,7 @@ class PdoSource implements SourceInterface
         );
 
         $this->selectStmt = $pdo->prepare(
-            "SELECT * FROM `$tablename` OFFSET $offset ROWS",
+            "SELECT * FROM `$tablename` LIMIT 18446744073709551615 OFFSET $offset",
             [\PDO::ATTR_CURSOR => \PDO::CURSOR_SCROLL],
         );
     }
