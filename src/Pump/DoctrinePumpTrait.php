@@ -25,7 +25,7 @@ trait DoctrinePumpTrait
         $entityManager = clone $entityManager;
 
         $middlewares = $entityManager->getConnection()->getConfiguration()->getMiddlewares();
-        $middlewares = \array_filter($middlewares, fn ($m) => !$m instanceof LoggingMiddleware);
+        $middlewares = \array_filter($middlewares, fn($m) => !$m instanceof LoggingMiddleware);
 
         $entityManager->getConnection()->getConfiguration()->setMiddlewares($middlewares);
 
@@ -49,7 +49,9 @@ trait DoctrinePumpTrait
             return;
         }
 
-        $this->entityManager->flush();
-        $this->entityManager->clear();
+        if ($context['count'] % 512 === 0 || $this->isAtEnd($context)) {
+            $this->entityManager->flush();
+            $this->entityManager->clear();
+        }
     }
 }

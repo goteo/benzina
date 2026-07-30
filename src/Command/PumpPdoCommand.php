@@ -108,6 +108,7 @@ EOF);
 
         $context = [
             'count' => 0,
+            'size' => $sourceSize,
             'source' => $source,
             'options' => $input->getOptions(),
             'arguments' => $input->getArguments(),
@@ -115,11 +116,12 @@ EOF);
         ];
 
         foreach ($source->records() as $record) {
+            ++$context['count'];
+
             foreach ($pumps as $pump) {
                 $pump->pump($record, $context);
             }
 
-            $context['count']++;
             $context['previous_record'] = $record;
 
             $progressBar->advance();
