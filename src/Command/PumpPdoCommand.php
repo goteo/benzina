@@ -16,10 +16,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 #[AsCommand(
-    name: 'benzina:pump',
-    description: 'Pump records from a v3 database into a v4 schema.',
+    name: 'benzina:pump:pdo',
+    description: 'Pump records from a PDO data source.',
 )]
-class PumpCommand extends Command
+class PumpPdoCommand extends Command
 {
     public function __construct(
         private Benzina $benzina,
@@ -43,7 +43,7 @@ class PumpCommand extends Command
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'The address of the database to read from',
-                'mysql://goteo:goteo@mariadb:3306/benzina'
+                'mysql://goteo:goteo@mariadb:3306/goteo3'
             )
             ->addOption(
                 'dry-run',
