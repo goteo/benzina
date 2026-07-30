@@ -7,9 +7,9 @@ interface SourceInterface
     /**
      * Obtain the records from the source.
      *
-     * @return \Traversable A traversable collection of records
+     * @return \Generator A collection of records
      */
-    public function records(): \Traversable;
+    public function records(): \Generator;
 
     /**
      * Obtain a single sample record from the source.

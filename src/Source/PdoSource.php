@@ -39,11 +39,13 @@ class PdoSource implements SourceInterface
         );
     }
 
-    public function records(): \Traversable
+    public function records(): \Generator
     {
         $this->selectStmt->execute();
 
-        return $this->selectStmt;
+        while ($row = $this->selectStmt->fetch()) {
+            yield $row;
+        }
     }
 
     public function sample(): mixed
