@@ -12,7 +12,10 @@ trait DoctrinePumpTrait
 
     private EntityManagerInterface $entityManager;
 
-    private bool $preventFlushAndClear;
+    private bool $preventFlushAndClear = false;
+
+    private int $flushBatchSize = 16;
+    private int $flushBatchCount = 0;
 
     public function getEntityManager(): EntityManagerInterface
     {
@@ -22,8 +25,6 @@ trait DoctrinePumpTrait
     #[Required()]
     public function setEntityManager(EntityManagerInterface $entityManager): void
     {
-        $entityManager = clone $entityManager;
-
         $middlewares = $entityManager->getConnection()->getConfiguration()->getMiddlewares();
         $middlewares = \array_filter($middlewares, fn($m) => !$m instanceof LoggingMiddleware);
 
@@ -35,6 +36,11 @@ trait DoctrinePumpTrait
     public function setPreventFlushAndClear(bool $preventFlushAndClear): void
     {
         $this->preventFlushAndClear = $preventFlushAndClear;
+    }
+
+    public function setFlushBatchSize(int $flushBatchSize): void
+    {
+        $this->flushBatchSize = $flushBatchSize;
     }
 
     public function persist(object $object, array $context): void
@@ -49,9 +55,11 @@ trait DoctrinePumpTrait
             return;
         }
 
-        if ($context['count'] % 512 === 0 || $this->isAtEnd($context)) {
+        if (++$this->flushBatchCount >= $this->flushBatchSize || $this->isAtEnd($context)) {
             $this->entityManager->flush();
             $this->entityManager->clear();
+
+            $this->flushBatchCount = 0;
         }
     }
 }
